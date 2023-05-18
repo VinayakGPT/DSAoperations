@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+void traversearr(int *a, int n)
+{
+    for (int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+    printf("\n");
+}
 void revarr(int *a, int n)
 {
     int temp;
@@ -82,12 +88,6 @@ void insertatpositiona(int a[], int position, int ele, int *n)
         a[i] = a[i - 1];
     }
     a[position - 1] = ele;
-}
-void traversearr(int *a, int n)
-{
-    for (int i = 0; i < n; i++)
-        printf("%d ", a[i]);
-    printf("\n");
 }
 int findmin(int a[], int n)
 {
@@ -629,22 +629,28 @@ struct node *mergell(struct node *s1, struct node *s2)
     temp->next = s2;
     return s1;
 }
-void displayodd(struct node *head) {
+void displayodd(struct node *head)
+{
     struct node *temp = head;
-    int count = 1; 
-    while (temp != NULL) {
-        if (count % 2 != 0) {
+    int count = 1;
+    while (temp != NULL)
+    {
+        if (count % 2 != 0)
+        {
             printf("%d ", temp->data);
         }
         temp = temp->next;
         count++;
     }
 }
-void displayeven(struct node *head) {
+void displayeven(struct node *head)
+{
     struct node *temp = head;
-    int count = 1; 
-    while (temp != NULL) {
-        if (count % 2 == 0) {
+    int count = 1;
+    while (temp != NULL)
+    {
+        if (count % 2 == 0)
+        {
             printf("%d ", temp->data);
         }
         temp = temp->next;
@@ -1510,6 +1516,340 @@ void stacklbottom(stackl *top)
         printf("The element at the bottom of the stack is %d", temp->data);
     }
 }
+typedef struct
+{
+    int size;
+    int front;
+    int rear;
+    int *arr;
+} queue;
+struct qnode
+{
+    int data;
+    struct qnode *next;
+};
+typedef struct
+{
+    int size;
+    int front;
+    int rear;
+    int *arr;
+} deque;
+struct qnode *f = NULL;
+struct qnode *r = NULL;
+int isfullq(queue *q)
+{
+    if (q->rear == q->size - 1)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+int isemptyq(queue *q)
+{
+    if (q->front == q->rear)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+void enqueue(queue *q, int ele)
+{
+    if (isfullq(q))
+    {
+        printf("Queue is full!");
+    }
+    else
+    {
+        q->rear++;
+        q->arr[q->rear] = ele;
+    }
+}
+int dequeue(queue *q)
+{
+    int a = -1;
+    if (isemptyq(q))
+    {
+        printf("Queue is empty!");
+    }
+    else
+    {
+        q->front++;
+        a = q->arr[q->front];
+    }
+    return a;
+}
+void displayq(queue *q)
+{
+    if (isemptyq(q))
+    {
+        printf("Queue is empty.\n");
+        return;
+    }
+    printf("Queue elements: ");
+    for (int i = q->front + 1; i <= q->rear; i++)
+    {
+        printf("%d ", q->arr[i]);
+    }
+    printf("\n");
+}
+
+void firstval(queue *q)
+{
+    printf("%d is the first value of the queue. \n", q->arr[q->front]);
+}
+void lastval(queue *q)
+{
+    printf("%d is the last value of the queue. \n", q->arr[q->rear]);
+}
+int isfullcq(queue *q)
+{
+    if ((q->rear + 1) % q->size == q->front)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+int isemptycq(queue *q)
+{
+    if (q->front == q->rear)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+void cenqueue(queue *q, int ele)
+{
+    if (isfullcq(q))
+    {
+        printf("Queue is full!");
+    }
+    else
+    {
+        q->rear = (q->rear + 1) % q->size;
+        q->arr[q->rear] = ele;
+        printf("Element %d successfully enqueued!\n", ele);
+    }
+}
+int cdequeue(queue *q)
+{
+    int a = -1;
+    if (isemptycq(q))
+    {
+        printf("Queue is empty!");
+    }
+    else
+    {
+        q->front = (q->front + 1) % q->size;
+        a = q->arr[q->front];
+    }
+    return a;
+}
+void displaycq(queue *q)
+{
+    if (isemptycq(q))
+    {
+        printf("Queue is empty.\n");
+        return;
+    }
+    int i = q->front + 1;
+    printf("Queue elements: ");
+    do
+    {
+        printf("%d ", q->arr[i]);
+        i = (i + 1) % q->size;
+    } while (i != (q->rear + 1) % q->size);
+}
+void displaylqueue(struct qnode *ptr)
+{
+    while (ptr != NULL)
+    {
+        printf("%d ", ptr->data);
+        ptr = ptr->next;
+    }
+}
+void lenqueue(int val)
+{
+    struct qnode *nnode = (struct qnode *)malloc(sizeof(struct qnode));
+    if (nnode == NULL)
+    {
+        printf("Queue is Full"); // memory not allocated from heap means that there is no space left.
+    }
+    else
+    {
+        nnode->data = val;
+        nnode->next = NULL;
+        if (f == NULL)
+        {
+            f = r = nnode;
+        }
+        else
+        {
+            r->next = nnode;
+            r = nnode;
+        }
+    }
+}
+int ldequeue()
+{
+    int a = -1;
+    struct qnode *ptr = f;
+    if (f == NULL)
+    {
+        printf("Queue is Empty\n");
+    }
+    else
+    {
+        f = f->next;
+        a = ptr->data;
+        free(ptr);
+    }
+    return a;
+}
+void SSenqueue(stack *s1, int val)
+{
+    if (isfull(s1))
+    {
+        printf("Queue is full. Cannot enqueue %d.\n", val);
+    }
+    else
+    {
+        pushelement(s1, val);
+        printf("%d enqueued to the queue.\n", val);
+    }
+}
+int SSdequeue(stack *s1, stack *s2)
+{
+    int x = -1;
+    if (isempty(s2) && isempty(s1))
+    {
+        printf("Queue is empty!");
+        return x;
+    }
+    else
+    {
+        int index = s1->top;
+        while (index >= 0)
+        {
+            pushelement(s2, popelement(s1));
+            index--;
+        }
+        x = popelement(s2);
+        return x;
+    }
+}
+void SSdisplayq(stack *s1, stack *s2)
+{
+    if (isempty(s1) && isempty(s2))
+    {
+        printf("Queue is empty!\n");
+        return;
+    }
+    while (!isempty(s1))
+    {
+        pushelement(s2, popelement(s1));
+    }
+
+    int index = s2->top;
+    while (index >= 0)
+    {
+        printf("%d ", s2->arr[index]);
+        index--;
+    }
+    printf("\n");
+}
+int isfulldeq(deque *q)
+{
+    if (q->rear == q->size - 1)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+int isemptydeq(deque *q)
+{
+    if (q->front == q->rear)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+void enqueuer(deque *q, int ele)
+{
+    if (isfulldeq(q))
+    {
+        printf("Queue is full!");
+    }
+    else
+    {
+        q->rear++;
+        q->arr[q->rear] = ele;
+    }
+}
+void enqueuef(deque *q, int ele)
+{
+    if (isfulldeq(q))
+    {
+        printf("Queue is full!");
+    }
+    else
+    {
+        q->front++;
+        for (int i = q->rear; i > q->front - 1; i--)
+            q->arr[i + 1] = q->arr[i];
+        q->arr[q->front] = ele;
+        q->front--;
+        q->rear++;
+    }
+}
+int dequeuef(deque *q)
+{
+    int a = -1;
+    if (isemptydeq(q))
+    {
+        printf("Queue is empty!");
+    }
+    else
+    {
+        q->front++;
+        a = q->arr[q->front];
+    }
+    return a;
+}
+int dequeuer(deque *q)
+{
+    int a = -1;
+    if (isemptydeq(q))
+    {
+        printf("Queue is empty!");
+    }
+    else
+    {
+        a = q->arr[q->rear];
+        q->rear--;
+    }
+    return a;
+}
+void displaydeq(deque *q)
+{
+    if (isemptydeq(q))
+    {
+        printf("Queue is empty.\n");
+        return;
+    }
+    printf("Queue elements: ");
+    for (int i = q->front + 1; i <= q->rear; i++)
+    {
+        printf("%d ", q->arr[i]);
+    }
+    printf("\n");
+}
 int main()
 {
     int mainchoice, subchoice1, subchoice2, subchoice3, subsubchoice1, value, index;
@@ -1521,6 +1861,7 @@ int main()
         printf("3. Doubly Linked List\n");
         printf("4. Circular Linked List\n");
         printf("5. Stack\n");
+        printf("6. Queue\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &mainchoice);
@@ -2032,7 +2373,7 @@ int main()
                         scanf("%d", &value);
                         s2 = push(s2, value);
                     }
-                    head=mergell(head,s2);
+                    head = mergell(head, s2);
                     printlist(head);
                     break;
                 case 16:
@@ -2404,6 +2745,290 @@ int main()
                     } while (subsubchoice4 != 0);
                 }
             } while (subchoice5 != 0);
+            break;
+        case 6:
+            int subchoice6, subsubchoice5;
+            queue *q = (queue *)malloc(sizeof(queue));
+            do
+            {
+                printf("\n----- Queue Menu -----\n");
+                printf("1. Implement queue using Array.\n");
+                printf("2. Implement queue using Circular Array.\n");
+                printf("3. Implement queue using Linked List.\n");
+                printf("4. Implement queue using 2 Stacks.\n");
+                printf("5. Implement Double Ended Queue using Array.\n");
+                printf("0. Exit\n");
+                printf("Enter your choice: ");
+                scanf("%d", &subchoice6);
+                switch (subchoice6)
+                {
+                case 1:
+                    printf("Let's implement queue using array.\n");
+                    printf("Enter the size of the input : ");
+                    scanf("%d", &size);
+                    q->size = 100;
+                    q->front = -1;
+                    q->rear = -1;
+                    q->arr = (int *)malloc(q->size * sizeof(int));
+                    for (int i = 0; i < size; i++)
+                    {
+                        printf("Enter element : ");
+                        scanf("%d", &val);
+                        enqueue(q, val);
+                    }
+                    do
+                    {
+                        printf("\n----- Queue implemented using Array Menu -----\n");
+                        printf("1. Enqueue element in queue\n");
+                        printf("2. Dequeue element in queue\n");
+                        printf("3. Display queue\n");
+                        printf("4. Display first element in queue\n");
+                        printf("5. Display last element in queue\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice5);
+
+                        switch (subsubchoice5)
+                        {
+                        case 1:
+                            printf("Enter the value to enqueue: ");
+                            scanf("%d", &val);
+                            enqueue(q, val);
+                            printf("Element %d successfully enqueued!\n", val);
+                            break;
+                        case 2:
+                            val = dequeue(q);
+                            if (val != -1)
+                                printf("%d dequeued from queue.\n", val);
+                            break;
+                        case 3:
+                            displayq(q);
+                            break;
+                        case 4:
+                            firstval(q);
+                            break;
+                        case 5:
+                            lastval(q);
+                            break;
+                        case 0:
+                            printf("Exiting the program.\n");
+                            break;
+                        default:
+                            printf("Invalid choice! Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice5 != 0);
+                    break;
+                case 2:
+                    printf("Let's implement circular queue using array.\n");
+                    printf("Enter the size of the circular queue : ");
+                    scanf("%d", &n);
+                    q->size = n + 1;
+                    q->front = 0;
+                    q->rear = 0;
+                    q->arr = (int *)malloc(q->size * sizeof(int));
+                    for (int i = 1; i < q->size; i++)
+                    {
+                        printf("Enter element : ");
+                        scanf("%d", &val);
+                        cenqueue(q, val);
+                    }
+                    do
+                    {
+                        printf("\n----- Circular Queue implemented using Array Menu -----\n");
+                        printf("1. Enqueue element in circular queue\n");
+                        printf("2. Dequeue element in circular queue\n");
+                        printf("3. Display circular queue\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice5);
+
+                        switch (subsubchoice5)
+                        {
+                        case 1:
+                            printf("Enter the value to enqueue: ");
+                            scanf("%d", &val);
+                            cenqueue(q, val);
+                            break;
+                        case 2:
+                            val = cdequeue(q);
+                            if (val != -1)
+                                printf("%d dequeued from queue.\n", val);
+                            break;
+                        case 3:
+                            displaycq(q);
+                            break;
+                        case 0:
+                            printf("Exiting the program.\n");
+                            break;
+                        default:
+                            printf("Invalid choice! Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice5 != 0);
+                    break;
+                case 3:
+                    int n;
+                    printf("Let's implement queue using linked list. \n");
+                    printf("Enter the size of input : ");
+                    scanf("%d", &n);
+                    for (int i = 0; i < n; i++)
+                    {
+                        printf("Enter number : ");
+                        scanf("%d", &val);
+                        lenqueue(val);
+                    }
+                    do
+                    {
+                        printf("\n----- Circular Queue implemented using Linked List Menu -----\n");
+                        printf("1. Enqueue element in queue\n");
+                        printf("2. Dequeue element in queue\n");
+                        printf("3. Display queue\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice5);
+
+                        switch (subsubchoice5)
+                        {
+                        case 1:
+                            printf("Enter the value to enqueue: ");
+                            scanf("%d", &val);
+                            lenqueue(val);
+                            break;
+                        case 2:
+                            val = ldequeue();
+                            if (val != -1)
+                                printf("%d dequeued from queue.\n", val);
+                            break;
+                        case 3:
+                            displaylqueue(f);
+                            break;
+                        case 0:
+                            printf("Exiting the program.\n");
+                            break;
+                        default:
+                            printf("Invalid choice! Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice5 != 0);
+                    break;
+                case 4:
+                    printf("Let's implement queue using two stacks.\n");
+                    stack *s1 = (stack *)malloc(sizeof(stack));
+                    stack *s2 = (stack *)malloc(sizeof(stack));
+                    s1->top = -1;
+                    s2->top = -1;
+                    s1->size = 100;
+                    s2->size = 100;
+                    s1->arr = (int *)malloc(s1->size * sizeof(int));
+                    s2->arr = (int *)malloc(s2->size * sizeof(int));
+                    printf("Enter the size of queue : ");
+                    scanf("%d", &n);
+                    printf("Enter the elements : \n");
+                    for (int i = 0; i < n; i++)
+                    {
+                        scanf("%d", &val);
+                        pushelement(s1, val);
+                    }
+                    do
+                    {
+                        printf("\n----- Queue implemented using 2 Stacks Menu -----\n");
+                        printf("1. Enqueue element in queue\n");
+                        printf("2. Dequeue element in queue\n");
+                        printf("3. Display queue\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice5);
+
+                        switch (subsubchoice5)
+                        {
+                        case 1:
+                            printf("Enter the value to enqueue: ");
+                            scanf("%d", &val);
+                            SSenqueue(s1, val);
+                            break;
+                        case 2:
+                            val = SSdequeue(s1, s2);
+                            if (val != -1)
+                                printf("%d dequeued from queue.\n", val);
+                            break;
+                        case 3:
+                            SSdisplayq(s1, s2);
+                            break;
+                        case 0:
+                            printf("Exiting the program.\n");
+                            break;
+                        default:
+                            printf("Invalid choice! Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice5 != 0);
+                    break;
+                case 5:
+                    deque *q = (deque *)malloc(sizeof(deque));
+                    printf("Let's implement queue using array.\n");
+                    printf("Enter the size of the input : ");
+                    scanf("%d", &size);
+                    q->size = 100;
+                    q->front = -1;
+                    q->rear = -1;
+                    q->arr = (int *)malloc(q->size * sizeof(int));
+                    for (int i = 0; i < size; i++)
+                    {
+                        printf("Enter element : ");
+                        scanf("%d", &val);
+                        enqueuer(q, val);
+                    }
+                    do
+                    {
+                        printf("\n----- DEQueue implemented using Array Menu -----\n");
+                        printf("1. Enqueue element from front in queue\n");
+                        printf("2. Enqueue element from rear in queue\n");
+                        printf("3. Dequeue element from front in queue\n");
+                        printf("4. Dequeue element from rear in queue\n");
+                        printf("5. Display queue\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice5);
+
+                        switch (subsubchoice5)
+                        {
+                        case 1:
+                            printf("Enter the value to enqueue from front: ");
+                            scanf("%d", &val);
+                            enqueuef(q, val);
+                            printf("Element %d successfully enqueued!\n", val);
+                            break;
+                        case 2:
+                            printf("Enter the value to enqueue from rear: ");
+                            scanf("%d", &val);
+                            enqueuer(q, val);
+                            printf("Element %d successfully enqueued!\n", val);
+                            break;
+                        case 3:
+                            val = dequeuef(q);
+                            if (val != -1)
+                                printf("%d dequeued from front of queue.\n", val);
+                            break;
+                        case 4:
+                            val = dequeuer(q);
+                            if (val != -1)
+                                printf("%d dequeued from rear of queue.\n", val);
+                            break;
+                        case 5:
+                            displaydeq(q);
+                            break;
+                        case 0:
+                            printf("Exiting the program.\n");
+                            break;
+                        default:
+                            printf("Invalid choice! Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice5 != 0);
+                }
+            } while (subchoice6 != 0);
+            break;
         case 0:
             printf("Exiting the program. Bye!\n");
             break;
