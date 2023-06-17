@@ -660,18 +660,18 @@ void displayeven(struct node *head)
 struct node *reverselist(struct node *head)
 {
     struct node *prev = NULL;
-    struct node *current = head;
     struct node *nextnode = NULL;
-
-    while (current != NULL)
+    while (head != NULL)
     {
-        nextnode = current->next;
-        current->next = prev;
-        prev = current;
-        current = nextnode;
+        nextnode = head->next;
+        head->next = prev;
+        prev = head;
+        head = nextnode;
     }
-    return prev;
+    head = prev;
+    return head;
 }
+
 struct node *insertatbeginning(struct node *head, int value)
 {
     struct node *newnode = (struct node *)malloc(sizeof(struct node));
@@ -1850,22 +1850,301 @@ void displaydeq(deque *q)
     }
     printf("\n");
 }
+typedef struct tnode
+{
+    int data;
+    struct tnode *left;
+    struct tnode *right;
+} tree;
+
+tree *root = NULL;
+tree *create()
+{
+    tree *nnode;
+    int val;
+    printf("Enter data: ");
+    scanf("%d", &val);
+
+    if (val == -1)
+        return NULL;
+
+    nnode = (tree *)malloc(sizeof(tree));
+    nnode->data = val;
+
+    printf("Enter left child of %d\n", val);
+    nnode->left = create();
+
+    printf("Enter right child of %d\n", val);
+    nnode->right = create();
+
+    return nnode;
+}
+
+tree *newnode(int data)
+{
+    tree *node = (tree *)malloc(sizeof(tree));
+    node->data = data;
+    node->left = NULL;
+    node->right = NULL;
+
+    return (node);
+}
+
+tree *buildtreepre(int in[], int pre[], int inStrt, int inEnd)
+{
+    static int preIndex = 0;
+
+    if (inStrt > inEnd)
+        return NULL;
+
+    tree *nnode = newnode(pre[preIndex++]);
+
+    if (inStrt == inEnd)
+        return nnode;
+
+    int inIndex = lookup(in, inStrt, inEnd, nnode->data);
+
+    nnode->left = buildtreepre(in, pre, inStrt, inIndex - 1);
+    nnode->right = buildtreepre(in, pre, inIndex + 1, inEnd);
+
+    return nnode;
+}
+tree *buildtreepost(int in[], int post[], int inStrt, int inEnd, int *postIndex) // here, static int cannot be used to assign value as it has to be assigned a constant value. postIndex here, could not be static, so we pass its address instead.
+{
+    if (inStrt > inEnd)
+        return NULL;
+
+    tree *node = newnode(post[(*postIndex)--]);
+
+    if (inStrt == inEnd)
+        return node;
+
+    int inIndex = lookup(in, inStrt, inEnd, node->data);
+
+    node->right = buildtreepost(in, post, inIndex + 1, inEnd, postIndex);
+    node->left = buildtreepost(in, post, inStrt, inIndex - 1, postIndex);
+
+    return node;
+}
+int lookup(int arr[], int strt, int end, int value)
+{
+    int i;
+    for (i = strt; i <= end; i++)
+    {
+        if (arr[i] == value)
+            return i;
+    }
+}
+
+void PreOrder(tree *ptr)
+{
+    if (ptr != NULL)
+    {
+        printf("%d ", ptr->data);
+        PreOrder(ptr->left);
+        PreOrder(ptr->right);
+    }
+}
+
+void InOrder(tree *ptr)
+{
+    if (ptr != NULL)
+    {
+        InOrder(ptr->left);
+        printf("%d ", ptr->data);
+        InOrder(ptr->right);
+    }
+}
+
+void PostOrder(tree *ptr)
+{
+    if (ptr != NULL)
+    {
+        PostOrder(ptr->left);
+        PostOrder(ptr->right);
+        printf("%d ", ptr->data);
+    }
+}
+
+int getheight(tree *node)
+{
+    if (node == NULL)
+        return 0;
+    int leftheight = getheight(node->left);
+    int rightheight = getheight(node->right);
+    return 1 + (leftheight > rightheight ? leftheight : rightheight);
+}
+
+void printlevel(tree *node, int level)
+{
+    if (node == NULL)
+        return;
+    if (level == 1)
+        printf("%d ", node->data);
+    else if (level > 1)
+    {
+        printlevel(node->left, level - 1);
+        printlevel(node->right, level - 1);
+    }
+}
+
+void LevelOrder(tree *root)
+{
+    int height = getheight(root);
+    for (int level = 1; level <= height; level++)
+        printlevel(root, level);
+}
+
+int getheightele(tree *node, int ele)
+{
+    if (node == NULL)
+        return -1;
+
+    if (node->data == ele)
+        return getheight(node);
+
+    int leftheight = getheightele(node->left, ele);
+    if (leftheight != -1)
+        return leftheight;
+
+    int rightheight = getheightele(node->right, ele);
+    if (rightheight != -1)
+        return rightheight;
+    return -1;
+}
+
+void mirror(tree *ptr)
+{
+    if (ptr == NULL)
+        return;
+    else
+    {
+        tree *temp;
+        mirror(ptr->left);
+        mirror(ptr->right);
+
+        temp = ptr->left;
+        ptr->left = ptr->right;
+        ptr->right = temp;
+    }
+}
+
+void deleteTree(tree *ptr)
+{
+    if (ptr != NULL)
+    {
+        deleteTree(ptr->left);
+        deleteTree(ptr->right);
+        free(ptr);
+    }
+}
+
+tree *bstsearch(tree *t, int key)
+{
+    if (t == NULL)
+        return NULL;
+    if (key == t->data)
+        return t;
+    else if (key < t->data)
+        return bstsearch(t->left, key);
+    else
+        return bstsearch(t->right, key);
+}
+
+void insert(tree *t, int key)
+{
+    tree *r = NULL;
+    while (t != NULL)
+    {
+        r = t;
+        if (key == t->data)
+            return;
+        else if (key < t->data)
+            t = t->left;
+        else
+            t = t->right;
+    }
+    tree *p = (tree *)malloc(sizeof(tree));
+    p->data = key;
+    p->left = p->right = NULL;
+    if (p->data < r->data)
+        r->left = p;
+    else
+        r->right = p;
+}
+tree *InPre(tree *p)
+{
+    while (p && p->right != NULL)
+        p = p->right;
+    return p;
+}
+
+tree *InSucc(tree *p)
+{
+    while (p && p->left != NULL)
+        p = p->left;
+    return p;
+}
+
+tree *bstdelete(tree *p, int key)
+{
+    tree *q;
+    if (p == NULL)
+        return NULL;
+    if (p->left == NULL && p->right == NULL)
+    {
+        if (p == root)
+            root = NULL;
+        free(p);
+        return NULL;
+    }
+    if (key < p->data)
+        p->left = bstdelete(p->left, key);
+    else if (key > p->data)
+        p->right = bstdelete(p->right, key);
+    else
+    {
+        if (getheight(p->left) > getheight(p->right))
+        {
+            q = InPre(p->left);
+            p->data = q->data;
+            p->left = bstdelete(p->left, q->data);
+        }
+        else
+        {
+            q = InSucc(p->right);
+            p->data = q->data;
+            p->right = bstdelete(p->right, q->data);
+        }
+    }
+    return p;
+}
 int main()
 {
     int mainchoice, subchoice1, subchoice2, subchoice3, subsubchoice1, value, index;
     do
     {
-        printf("Menu:\n");
+        printf("----- Data Structures Menu -----\n");
         printf("1. Array\n");
         printf("2. Singly Linked List\n");
         printf("3. Doubly Linked List\n");
         printf("4. Circular Linked List\n");
         printf("5. Stack\n");
         printf("6. Queue\n");
+        printf("7. Tree\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &mainchoice);
-
+        //Since we can't declare variable length arrays inside switch case function, for operating with Binary trees, the following is required.
+        int len;
+        if (mainchoice == 7)
+        {
+            printf("Enter the number of nodes in the tree (Enter 0 if you want to create tree by giving input) : ");
+            scanf("%d", &len);
+        }
+        int in[len];
+        int pre[len];
+        int post[len];
         switch (mainchoice)
         {
         case 1:
@@ -2880,7 +3159,7 @@ int main()
                     }
                     do
                     {
-                        printf("\n----- Circular Queue implemented using Linked List Menu -----\n");
+                        printf("\n----- Queue implemented using Linked List Menu -----\n");
                         printf("1. Enqueue element in queue\n");
                         printf("2. Dequeue element in queue\n");
                         printf("3. Display queue\n");
@@ -3029,6 +3308,194 @@ int main()
                 }
             } while (subchoice6 != 0);
             break;
+            
+        case 7:
+            int subchoice7, subsubchoice6;
+            do
+            {
+                printf("\n----- Binary Tree Menu -----\n");
+                printf("1. Binary Tree\n");
+                printf("2. Binary Search Tree\n");
+                printf("0. Exit\n");
+                printf("Enter your choice: ");
+                scanf("%d", &subchoice7);
+
+                switch (subchoice7)
+                {
+
+                case 1:
+                    do
+                    {
+                        printf("\n----- Binary Tree Menu -----\n");
+                        printf("1. Create Binary Tree\n");
+                        printf("2. PreOrder Traversal\n");
+                        printf("3. InOrder Traversal\n");
+                        printf("4. PostOrder Traversal\n");
+                        printf("5. LevelOrder Traversal\n");
+                        printf("6. Calculate height of tree\n");
+                        printf("7. Check height of element in tree\n");
+                        printf("8. Create tree from InOrder and PreOrder traversals\n");
+                        printf("9. Create tree from InOrder and PostOrder traversals\n");
+                        printf("10. Mirror Image of Tree\n");
+                        printf("11. Delete Tree\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice6);
+
+                        switch (subsubchoice6)
+                        {
+                        case 1:
+                            printf("To stop entering data, enter -1!\n");
+                            root = create();
+                            break;
+                        case 2:
+                            printf("Preorder Traversal: ");
+                            PreOrder(root);
+                            printf("\n");
+                            break;
+                        case 3:
+                            printf("Inorder Traversal: ");
+                            InOrder(root);
+                            printf("\n");
+                            break;
+                        case 4:
+                            printf("Postorder Traversal: ");
+                            PostOrder(root);
+                            printf("\n");
+                            break;
+                        case 5:
+                            printf("Level Order Traversal: ");
+                            LevelOrder(root);
+                            printf("\n");
+                            break;
+                        case 6:
+                            int height = getheight(root);
+                            printf("The height of the tree is %d\n", height);
+                            break;
+                        case 7:
+                            int ele;
+                            printf("Enter element to search : ");
+                            scanf("%d", &ele);
+                            int heightele = getheightele(root, ele);
+                            printf("Element is at %d\n", heightele);
+                            break;
+                        case 8:
+                            printf("Enter the elements of InOrder :");
+                            for (int i = 0; i < len; i++)
+                            {
+                                scanf("%d", &in[i]);
+                            }
+                            printf("Enter the elements of PreOrder :");
+                            for (int i = 0; i < len; i++)
+                            {
+                                scanf("%d", &pre[i]);
+                            }
+                            root = buildtreepre(in, pre, 0, len - 1);
+                            break;
+                        case 9:
+                            printf("Enter the elements of InOrder :");
+                            for (int i = 0; i < len; i++)
+                            {
+                                scanf("%d", &in[i]);
+                            }
+                            printf("Enter the elements of PostOrder :");
+                            for (int i = 0; i < len; i++)
+                            {
+                                scanf("%d", &post[i]);
+                            }
+                            int postIndex = len - 1;
+                            root = buildtreepost(in, post, 0, len - 1, &postIndex);
+                            break;
+                        case 10:
+                            printf("\nMirror Image of Tree:\n");
+                            mirror(root);
+                            printf("Tree mirrored.\n");
+                            break;
+                        case 11:
+                            printf("\nDeleting Tree:\n");
+                            deleteTree(root);
+                            root = NULL;
+                            printf("Tree deleted.\n");
+                            break;
+                        case 0:
+                            printf("Exiting...\n");
+                            break;
+                        default:
+                            printf("Invalid choice! Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice6 != 0);
+                    free(root);
+                    break;
+                case 2:
+                    int key;
+                    do
+                    {
+                        printf("\n----- Binary Search Tree Menu -----\n");
+                        printf("1. Create a binary tree\n");
+                        printf("2. Search for a node\n");
+                        printf("3. InOrder traversal\n");
+                        printf("4. Insert a node\n");
+                        printf("5. Delete a node\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &subsubchoice6);
+
+                        switch (subsubchoice6)
+                        {
+                        case 1:
+                            printf("\nCreating a binary tree:\n");
+                            root = create();
+                            printf("Binary tree created.\n");
+                            break;
+
+                        case 2:
+                            printf("\nEnter the key to search: ");
+                            scanf("%d", &key);
+                            tree *result = bstsearch(root, key);
+                            if (result != NULL)
+                                printf("Node found: %d\n", result->data);
+                            else
+                                printf("Node not found.\n");
+                            break;
+
+                        case 3:
+                            printf("\nInOrder traversal: ");
+                            InOrder(root);
+                            printf("\n");
+                            break;
+
+                        case 4:
+                            printf("\nEnter the key to insert: ");
+                            scanf("%d", &key);
+                            insert(root, key);
+                            printf("Node inserted.\n");
+                            break;
+
+                        case 5:
+                            printf("\nEnter the key to delete: ");
+                            scanf("%d", &key);
+                            root = bstdelete(root, key);
+                            printf("Node deleted.\n");
+                            break;
+
+                        case 0:
+                            printf("\nExiting...\n");
+                            break;
+
+                        default:
+                            printf("\nInvalid choice. Please try again.\n");
+                            break;
+                        }
+                    } while (subsubchoice6 != 0);
+                    break;
+                case 0:
+                    printf("Exiting...\n");
+                    break;
+                default:
+                    printf("Invalid Choice. Please try again.\n");
+                }
+            } while (subchoice7 != 0);
         case 0:
             printf("Exiting the program. Bye!\n");
             break;
