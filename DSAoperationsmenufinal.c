@@ -2168,6 +2168,7 @@ int main()
         printf("5. Stack\n");
         printf("6. Queue\n");
         printf("7. Tree\n");
+        printf("8. Graph\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &mainchoice);
