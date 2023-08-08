@@ -13,7 +13,14 @@ void displaypoly(poly *head)
     ptr = ptr->next;
     while (ptr != NULL)
     {
-        if (ptr->exp != 0)
+        if (ptr->exp == 1)
+        {
+            if (ptr->coef > 0)
+                printf("+ %.1fx ", ptr->coef);
+            else
+                printf("- %.1fx ", -1 * ptr->coef);
+        }
+        else if (ptr->exp != 0)
         {
             if (ptr->coef > 0)
                 printf("+ %.1fx^%d ", ptr->coef, ptr->exp);
@@ -151,20 +158,22 @@ poly *multiply(poly *poly1, poly *poly2)
         }
         temp1 = temp1->next;
     }
-    temp1 = poly3;
-    while (temp1->next != 0)
+
+    poly *current = poly3;
+    while (current != NULL && current->next != NULL) //both are reqd because this restricts access of current->next when current is the last node of the linked list.
     {
-        if (temp1->exp == temp1->next->exp)
+        if (current->exp == current->next->exp)
         {
-            poly *temp = temp1->next;
-            temp1->coef = temp1->coef + temp1->next->coef;
-            temp1->next = temp->next;
+            current->coef = current->coef + current->next->coef;
+            poly *temp = current->next;
+            current->next = temp->next;
             free(temp);
         }
-        temp1=temp1->next;
+        current = current->next;
     }
     return poly3;
 }
+
 int main()
 {
     poly *poly1 = NULL;
